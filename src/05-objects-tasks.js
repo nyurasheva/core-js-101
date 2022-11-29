@@ -114,32 +114,64 @@ function fromJSON(proto, json) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  res: '',
+  order: [],
+  errorText1: 'Element, id and pseudo-element should not occur more then one time inside the selector',
+  errorText2: 'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element',
+
+  stringify() {
+    return this.res;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  cssBuilder(num, value) {
+    const obj = Object.create(this);
+    obj.order = this.order.concat(num);
+    this.er1(obj.order);
+    this.er2(obj.order);
+    obj.res = this.res + value;
+    return obj;
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  er1(order) {
+    const index = order.filter((e) => (e < 2) || (e > 4))
+      .findIndex((e, i, a) => a.indexOf(e) !== i);
+    if (index >= 0) throw new Error(this.errorText1);
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  er2(order) {
+    const copy = Array(order.length).fill().map((_, i) => order[i]);
+    copy.sort((a, b) => a - b);
+    if (!(copy.every((e, i) => e === order[i]))) throw new Error(this.errorText2);
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    return this.cssBuilder(0, value);
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    return this.cssBuilder(1, `#${value}`);
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  class(value) {
+    return this.cssBuilder(2, `.${value}`);
+  },
+
+  attr(value) {
+    return this.cssBuilder(3, `[${value}]`);
+  },
+
+  pseudoClass(value) {
+    return this.cssBuilder(4, `:${value}`);
+  },
+
+  pseudoElement(value) {
+    return this.cssBuilder(5, `::${value}`);
+  },
+
+  combine(selector1, combinator, selector2) {
+    const obj = Object.create(this);
+    obj.res = `${selector1.res} ${combinator} ${selector2.res}`;
+    return obj;
   },
 };
 
