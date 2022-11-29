@@ -327,22 +327,18 @@ function isBracketsBalanced(str) {
         if (stack[stack.length - 1] !== '<') return false;
         stack.pop();
         break;
-
       case ')':
         if (stack[stack.length - 1] !== '(') return false;
         stack.pop();
         break;
-
       case ']':
         if (stack[stack.length - 1] !== '[') return false;
         stack.pop();
         break;
-
       case '}':
         if (stack[stack.length - 1] !== '{') return false;
         stack.pop();
         break;
-
       default:
         break;
     }
